@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "283247129694",
+    "firebase_url": "https://that2-c42a2.firebaseio.com",
+    "project_id": "that2-c42a2",
+    "storage_bucket": "that2-c42a2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:283247129694:android:614403e11bc8d30e",
+        "android_client_info": {
+          "package_name": "com.stackola.that"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "283247129694-sp3vk908bj2ndfescgpumim4e0atdddp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB-igCeLMI7VYnWxVOy0NqxtVpJ6287V8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
