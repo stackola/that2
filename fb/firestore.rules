@@ -4,7 +4,8 @@ service cloud.firestore {
       allow read, write: if false;
     }
     match /users/{user} {
-      allow create, update: if request.auth.uid == user;
+      allow create: if !exists(/databases/$(database)/documents/users/$(request.resource.data.username))
+      allow update: if request.auth.uid == user && request.resource.data.username == resource.data.username;
       allow read: if true;
     }
     match /groups/{allDocuments=**}{

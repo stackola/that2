@@ -22,7 +22,7 @@ export default class InputBox extends Component {
     this.state = {
       input: "",
       loading: false,
-      image:null,
+      image: null
     };
     if (Platform.OS === "android") {
       UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -39,17 +39,18 @@ export default class InputBox extends Component {
   isExpanded() {
     return this.state.input != "" || this.state.image;
   }
-  setImage(i){
+  setImage(i) {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    this.setState({image:i});
+    this.setState({ image: i });
   }
-  canSend(){
+  canSend() {
     return this.isExpanded();
   }
   send() {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     this.setState({ loading: true }, () => {
       post(this.state.input, this.state.image, this.props.path).then(() => {
-        this.setState({ loading: false, input: "", image:null });
+        this.setState({ loading: false, input: "", image: null });
       });
     });
   }
@@ -67,19 +68,28 @@ export default class InputBox extends Component {
           borderRadius: 2
         }}
       >
-      <View style={{flex:1}}>
-
-        <TextInput
-          value={this.state.input}
-          onChangeText={t => {
-            this.setInput(t);
+        <View style={{ flex: 1 }}>
+          <TextInput
+            value={this.state.input}
+            onChangeText={t => {
+              this.setInput(t);
+            }}
+            multiline={true}
+            style={{
+              height: isEx ? 98 : 48,
+              textAlignVertical: isEx ? "top" : "auto",
+              flex: 1
+            }}
+          />
+        </View>
+        <ImageUpload
+          isEx={isEx}
+          color={this.props.color}
+          setImage={i => {
+            this.setImage(i);
           }}
-          multiline={true}
-          style={{ height: isEx ? 98 : 48 , textAlignVertical: isEx?'top':'auto', flex:1}}
         />
-      </View>
-      <ImageUpload isEx={isEx} color={this.props.color} setImage={(i)=>{this.setImage(i)}}/>
-     
+
         <TouchableOpacity
           disabled={!this.canSend()}
           onPress={() => {

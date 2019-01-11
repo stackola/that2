@@ -14,12 +14,13 @@ exports.post = functions.https.onCall((data, context) => {
 
   const uid = context.auth.uid;
   const name = context.auth.token.name || null;
+  const displayName = context.auth.token.displayName || null;
   const picture = context.auth.token.picture || null;
   const email = context.auth.token.email || null;
 
   if (!context.auth || !name) {
     // Throwing an HttpsError so that the client gets the error details.
-    return { error: "Not authenticated" };
+    return { error: "Not authenticated", uid, name, displayName };
   }
 
   // TODO: Check ban list. Check allow anonymous. Check if either home town or in raidus.

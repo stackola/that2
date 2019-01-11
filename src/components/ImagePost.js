@@ -21,7 +21,7 @@ class Post extends PureComponent {
   render() {
     let isImage = !!this.props.image;
     console.log("render post");
-    let isHome = this.props.isHome;
+    let isHome = this.props.isHome || this.props.isBaseGroup;
     return (
       <ImageBackground
         source={{ uri: this.props.image }}
@@ -70,10 +70,10 @@ class Post extends PureComponent {
               justifyContent: "center"
             }}
           >
-            <Icon name="face" color={this.props.color} size={25} />
             <Text style={{ fontSize: 25, color: this.props.color }}>
               {this.props.comments}
             </Text>
+            <Icon name="face" color={this.props.color} size={25} />
           </View>
           <View
             style={{
@@ -92,7 +92,7 @@ class Post extends PureComponent {
             >
               {this.props.text}
             </Text>
-            {!isHome && (
+            {!isHome && !this.props.isBaseGroup && (
               <View style={{ flexDirection: "row" }}>
                 <Text
                   style={{

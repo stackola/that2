@@ -23,7 +23,7 @@ class Provider extends React.PureComponent {
           closeOverlay: () => {
             this.closeOverlay();
           },
-          openOverlay: (i) => {
+          openOverlay: i => {
             this.openOverlay(i);
           }
         }}

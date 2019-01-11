@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { Text, View, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator
+} from "react-native";
 
 import { uploadImage } from "That/src/lib";
 
@@ -33,7 +39,6 @@ export default class ImageUpload extends Component {
             : [...(pickerOptions.customButtons || [])]
         },
         response => {
-          console.log(response);
           if (response && response.path) {
             uploadImage(response.path, response.width, response.height, d => {
               console.log("got response", d);
@@ -44,11 +49,17 @@ export default class ImageUpload extends Component {
               });
             });
           } else {
-            this.props.setImage(null);
-            this.setState({
-              imageLoading: false,
-              image: null
-            });
+            console.log(response);
+            if (
+              (!this.state.image && response.didCancel) ||
+              (this.state.image && response.customButton)
+            ) {
+              this.props.setImage(null);
+              this.setState({
+                imageLoading: false,
+                image: null
+              });
+            }
           }
         }
       );
@@ -76,16 +87,15 @@ export default class ImageUpload extends Component {
 
         {this.state.imageLoading && !this.state.image ? (
           <View
-           
             style={{
               width: this.props.isEx ? 70 : 50,
               flex: 1,
               backgroundColor: colors.dark,
-              alignItems:'center',
-              justifyContent:'center'
+              alignItems: "center",
+              justifyContent: "center"
             }}
           >
-            <ActivityIndicator/>           
+            <ActivityIndicator />
           </View>
         ) : null}
 

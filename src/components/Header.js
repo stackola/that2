@@ -78,7 +78,7 @@ class Header extends Component {
         )}
         <View style={{ flex: 1 }} />
         {!this.isHome() && (
-          <Button color={this.props.color} icon="floppy" marginRight={false} />
+          <Button color={this.props.color} icon="eye" marginRight={false} />
         )}
       </View>
     );

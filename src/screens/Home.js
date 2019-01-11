@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, ScrollView } from "react-native";
+import { Text, View, ScrollView, TouchableOpacity } from "react-native";
 import firebase from "react-native-firebase";
 import colors from "That/src/colors";
 import PostList from "That/src/components/PostList";
@@ -13,15 +13,33 @@ export default class Home extends Component {
 
   render() {
     let path = "groups/home";
-    let color = getColor("1");
+    let color = '#1E88E5';//getColor("13");
     return (
       <View style={{ flex: 1, backgroundColor: color, paddingTop: 4 }}>
         <PostList
           color={color}
           path={path}
-          canPost={false}
+          canPost={true}
           postInHeader={false}
           isHome={true}
+          footer={
+            <TouchableOpacity
+              onPress={() => {
+                firebase
+                  .auth()
+                  .signOut()
+                  .then(() => {
+                    firebase
+                      .auth()
+                      .signInAnonymously()
+                      .then(() => {
+                        this.props.navigation.navigate("Auth");
+                      });
+                  });
+              }}
+              style={{ height: 40 }}
+            />
+          }
         />
       </View>
     );

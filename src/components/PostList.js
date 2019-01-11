@@ -70,9 +70,9 @@ export default class PostList extends Component {
   subscribeToNewest() {
     this.sub1 = subTo(this.props.path, 1).onSnapshot(i => {
       i._changes.map(c => {
-        console.log(c);
+        //console.log(c);
         if (c.type == "added") {
-          console.log("adding", c._document._ref.path);
+          //console.log("adding", c._document._ref.path);
           this.addNew(c._document._ref.path);
         }
       });
@@ -82,6 +82,14 @@ export default class PostList extends Component {
   componentWillUnmount() {
     this.sub1 && this.sub1();
   }
+  isBaseGroup() {
+    let path = this.props.path;
+    if (!path) {
+      return false;
+    }
+
+    return path.split("/").length < 5;
+  }
 
   render() {
     let color = this.props.color;
@@ -89,6 +97,7 @@ export default class PostList extends Component {
     return (
       <FlatList
         keyboardShouldPersistTaps={"handled"}
+        ListFooterComponent={this.props.footer}
         ListHeaderComponent={
           <View>
             {this.props.postInHeader !== false && (
@@ -96,18 +105,20 @@ export default class PostList extends Component {
                 {post => {
                   return (
                     <ImagePost
-                    updated={post.updated}
-                    color={color}
-                    comments={post.comments}
-                    linkToSelf={true}
-                    path={post.parent + "/posts/" + post.id}
-                    time={post.time}
-                    text={post.text}
-                    image={post.image?post.image.url:null}
-                    isHome={this.props.isHome}
-                    username={post.name}
-                    userId={post.user}
-                  />
+                      updated={post.updated}
+                      color={color}
+                      comments={post.comments}
+                      linkToSelf={true}
+                      path={post.parent + "/posts/" + post.id}
+                      time={post.time}
+                      text={post.text}
+                      isHeader={true}
+                      isBaseGroup={this.isBaseGroup()}
+                      image={post.image ? post.image.url : null}
+                      isHome={this.props.isHome}
+                      username={post.name}
+                      userId={post.user}
+                    />
                   );
                 }}
               </PostLoader>
@@ -128,7 +139,6 @@ export default class PostList extends Component {
             <PostLoader color={color} path={p} realtime={true}>
               {post => {
                 return (
-                
                   <ImagePost
                     updated={post.updated}
                     color={color}
@@ -137,7 +147,7 @@ export default class PostList extends Component {
                     path={post.parent + "/posts/" + post.id}
                     time={post.time}
                     text={post.text}
-                    image={post.image?post.image.url:null}
+                    image={post.image ? post.image.url : null}
                     isHome={this.props.isHome}
                     username={post.name}
                     userId={post.user}

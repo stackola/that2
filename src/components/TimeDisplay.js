@@ -11,7 +11,7 @@ export default class TimeDisplay extends PureComponent {
     let wait = 1000 * 60;
     let distance = differenceInSeconds(new Date(), this.props.time);
     if (distance < 60) {
-      console.log(distance);
+      //console.log(distance);
       wait = 4000;
     }
     if (distance > 60 * 60) {
@@ -31,6 +31,10 @@ export default class TimeDisplay extends PureComponent {
     }
   }
   render() {
-    return <Text style={this.props.style}>{distanceInWordsStrict(this.props.time, new Date())}</Text>;
+    return (
+      <Text style={this.props.style}>
+        {distanceInWordsStrict(this.props.time, new Date())}
+      </Text>
+    );
   }
 }

@@ -1,5 +1,6 @@
 import firebase from "react-native-firebase";
 const sendPost = firebase.functions().httpsCallable("post");
+const sendUser = firebase.functions().httpsCallable("sendUser");
 const uuidv4 = require("uuid/v4");
 
 import hash from "material-color-hash";
@@ -19,11 +20,13 @@ export function getUser() {
   }
 }
 
-export function post(text, image,path) {
+export function post(text, image, path) {
+  console.log(getUser());
   console.log("GO");
-  return sendPost({ text, path,image })
+  return sendPost({ text, path, image })
     .then(r => {
       console.log(r);
+      return r;
     })
     .catch(err => {
       console.log(err);
@@ -38,7 +41,7 @@ export function getPosts(path, number) {
     .collection("posts")
     .orderBy("updated", "DESC")
     .limit(number)
-    .get()
+    .get();
 }
 
 export function subTo(path, number) {
@@ -48,19 +51,18 @@ export function subTo(path, number) {
     .doc(path)
     .collection("posts")
     .orderBy("updated", "DESC")
-    .limit(number)
+    .limit(number);
 }
 
-export function getColor(string){
-  
+export function getColor(string) {
   let c = "";
   let r = "";
   let add = "";
-  while (c!="rgba(255, 255, 255, 1)"){
-    r=hash(string+add);
+  while (c != "rgba(255, 255, 255, 1)") {
+    r = hash(string + add);
     console.log(r);
-    add+=".";
-    c=r.color;
+    add += ".";
+    c = r.color;
   }
   return r.backgroundColor;
 }
@@ -74,7 +76,7 @@ export function uploadImage(
 ) {
   var storage = firebase.storage();
   var storageRef = storage.ref();
-  var imagesRef = storageRef.child("uploads/" + getUID()+ "/images");
+  var imagesRef = storageRef.child("uploads/" + getUID() + "/images");
   var fileName = uuidv4();
   var imageRef = imagesRef.child(fileName + "." + fileType);
   imageRef.putFile(path).then(function(snapshot) {
@@ -112,4 +114,16 @@ function registerImage(snap) {
     .firestore()
     .doc(image.path)
     .set(image);
+}
+
+export function makeUser(u) {
+  if (u.username) {
+    return firebase
+      .firestore()
+      .collection("users")
+      .doc(u.username)
+      .set(u);
+  } else {
+    return Promise.reject();
+  }
 }
