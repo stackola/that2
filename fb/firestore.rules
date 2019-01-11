@@ -8,6 +8,10 @@ service cloud.firestore {
       allow update: if request.auth.uid == user && request.resource.data.username == resource.data.username;
       allow read: if true;
     }
+    match /users/{user}/saved/{saveId} {
+      allow read: if true;
+      allow write: if request.auth.token.name == user;
+    }
     match /groups/{allDocuments=**}{
       allow read: if true;
     }

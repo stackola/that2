@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, ScrollView } from "react-native";
+import { Text, View, ScrollView, StatusBar } from "react-native";
 import firebase from "react-native-firebase";
 import colors from "That/src/colors";
 import PostList from "That/src/components/PostList";
@@ -17,6 +17,11 @@ export default class Details extends Component {
     let color = getColor(path);
     return (
       <View style={{ flex: 1, backgroundColor: color, paddingTop: 4 }}>
+        <StatusBar
+          backgroundColor={color}
+          barStyle="light-content"
+          animated={true}
+        />
         <Header color={color} path={path} />
         <PostList color={color} path={path} />
       </View>

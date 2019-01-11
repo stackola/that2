@@ -1,8 +1,13 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { ActionCreators } from "That/src/redux/actions";
+import { bindActionCreators } from "redux";
 import { Text, View, TouchableOpacity } from "react-native";
 import colors from "That/src/colors";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { withNavigation } from "react-navigation";
+import { doSave } from "That/src/lib";
+
 class Header extends Component {
   getParentPath() {
     let p = this.props.path.split("/");
@@ -34,7 +39,18 @@ class Header extends Component {
     return this.props.path == "groups/home";
   }
   goBack() {
+    withNavigation(Header);
     this.props.navigation.goBack();
+  }
+  save() {
+    doSave(this.props.path);
+  }
+  isWatching() {
+    return (
+      this.props.user &&
+      this.props.user.subs &&
+      this.props.user.subs.includes(this.props.path)
+    );
   }
   render() {
     return (
@@ -77,9 +93,26 @@ class Header extends Component {
           />
         )}
         <View style={{ flex: 1 }} />
-        {!this.isHome() && (
-          <Button color={this.props.color} icon="eye" marginRight={false} />
-        )}
+        {!this.isHome() &&
+          (this.isWatching() ? (
+            <Button
+              onPress={() => {
+                this.save();
+              }}
+              color={this.props.color}
+              icon="eye-off"
+              marginRight={false}
+            />
+          ) : (
+            <Button
+              onPress={() => {
+                this.save();
+              }}
+              color={this.props.color}
+              icon="eye"
+              marginRight={false}
+            />
+          ))}
       </View>
     );
   }
@@ -109,4 +142,18 @@ function Button(props) {
     </TouchableOpacity>
   );
 }
-export default withNavigation(Header);
+
+function mapStateToProps(state) {
+  return {
+    user: state.user
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(ActionCreators, dispatch);
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withNavigation(Header));

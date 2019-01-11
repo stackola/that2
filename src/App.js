@@ -12,6 +12,10 @@ import AuthLoadingScreen from "./screens/AuthLoadingScreen";
 
 import { OverlayProvider } from "./components/overlay/";
 
+import { Provider } from "react-redux";
+
+import store from "That/src/redux/store";
+
 class OtherScreen extends React.Component {
   render() {
     return (
@@ -60,7 +64,9 @@ export default class MainApp extends React.Component {
   render() {
     return (
       <OverlayProvider>
-        <Navigator />
+        <Provider store={store}>
+          <Navigator />
+        </Provider>
       </OverlayProvider>
     );
   }

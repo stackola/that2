@@ -56,6 +56,16 @@ exports.post = functions.https.onCall((data, context) => {
     })
     .then(() => {
       incrementComments(path);
+      sendNotification(
+        path,
+        "Check that",
+        name + " replied to a post you are following.",
+        {
+          path: path,
+          type: "reply",
+          byUser: uid
+        }
+      );
       return {
         status: "ok",
         postId: newPost.id,
@@ -77,4 +87,33 @@ function incrementComments(path) {
       });
     });
   });
+}
+
+function sendNotification(path, title, text, data) {
+  data = data || {};
+  let id = getPathId(path);
+  console.log(data);
+  return admin
+    .messaging()
+    .send({
+      topic: id,
+      data: data || {},
+      android: { notification: { channelId: "test-channel" } },
+      notification: {
+        title: title,
+        body: text
+      }
+    })
+    .then(() => {
+      console.log("notification dispatched!");
+      return;
+    })
+    .catch(err => {
+      console.log("err", err);
+    });
+}
+
+function getPathId(p) {
+  let a = p.split("/");
+  return a[a.length - 1];
 }

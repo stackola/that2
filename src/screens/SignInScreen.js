@@ -7,7 +7,8 @@ import {
   Platform,
   UIManager,
   TouchableOpacity,
-  LayoutAnimation
+  LayoutAnimation,
+  StatusBar
 } from "react-native";
 import firebase from "react-native-firebase";
 import colors from "That/src/colors";
@@ -66,8 +67,20 @@ export default class Home extends Component {
         .then(enabled => {
           if (enabled) {
             this.setState({ notificationPermissions: true }, () => {
-              this.setToken();
+              //this.setToken();
             });
+          } else {
+            firebase
+              .messaging()
+              .requestPermission()
+              .then(() => {
+                this.setState({ notificationPermissions: true }, () => {
+                  //this.setToken();
+                });
+              })
+              .catch(error => {
+                // User has rejected permissions
+              });
           }
         });
     });
@@ -90,12 +103,12 @@ export default class Home extends Component {
   }
   enableNotifications() {
     this.setState({ notificationsEnabled: true }, () => {
-      this.setToken();
+      //this.setToken();
     });
   }
 
   render() {
-    let color = this.state.username?getColor(this.state.username):'#1E88E5';
+    let color = this.state.username ? getColor(this.state.username) : "#1E88E5";
     return !this.state.loading ? (
       <View
         style={{
@@ -107,6 +120,11 @@ export default class Home extends Component {
           justifyContent: "center"
         }}
       >
+        <StatusBar
+          animated={false}
+          backgroundColor={color}
+          barStyle="light-content"
+        />
         <Text
           style={{
             color: colors.light,
@@ -152,7 +170,7 @@ export default class Home extends Component {
             <Text style={{ color: colors.light }}>Enable notifications</Text>
           </TouchableOpacity>
         )}
-        {this.state.notificationsEnabled && this.state.token && (
+        {this.state.notificationsEnabled && this.state.notificationPermissions && (
           <View
             style={{
               height: 50,
@@ -223,6 +241,11 @@ export default class Home extends Component {
           justifyContent: "center"
         }}
       >
+        <StatusBar
+          animated={true}
+          backgroundColor={color}
+          barStyle="light-content"
+        />
         <Text
           style={{
             color: colors.light,

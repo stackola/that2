@@ -3,6 +3,8 @@ const sendPost = firebase.functions().httpsCallable("post");
 const sendUser = firebase.functions().httpsCallable("sendUser");
 const uuidv4 = require("uuid/v4");
 
+import { ToastAndroid } from "react-native";
+
 import hash from "material-color-hash";
 export function getUID() {
   if (getUser()) {
@@ -26,6 +28,8 @@ export function post(text, image, path) {
   return sendPost({ text, path, image })
     .then(r => {
       console.log(r);
+      doSave(r.data.newPath, true, false);
+      doSave(path, true, false);
       return r;
     })
     .catch(err => {
@@ -117,6 +121,7 @@ function registerImage(snap) {
 }
 
 export function makeUser(u) {
+  u = { ...u, id: getUID() };
   if (u.username) {
     return firebase
       .firestore()
@@ -126,4 +131,41 @@ export function makeUser(u) {
   } else {
     return Promise.reject();
   }
+}
+function getPathId(p) {
+  let a = p.split("/");
+  return a[a.length - 1];
+}
+export function doSave(path, onlySave, showToast=true) {
+  let user = getUser();
+  let username = user.displayName;
+  let ref = firebase
+    .firestore()
+    .collection("users")
+    .doc(username)
+    .collection("saved")
+    .doc(getPathId(path));
+
+  return ref.get().then(snap => {
+    console.log(snap);
+    if (snap.exists) {
+      //remove watching.
+      if (!onlySave) {
+        firebase
+          .messaging()
+          .unsubscribeFromTopic(getPathId(path))
+          .then(r => {
+            console.log(r);
+          });
+        showToast && ToastAndroid.show("No longer watching that", ToastAndroid.SHORT);
+        return ref.delete();
+      }
+    } else {
+      //add to watchlist.
+      firebase.messaging().subscribeToTopic(getPathId(path));
+      showToast && ToastAndroid.show("Watching that", ToastAndroid.SHORT);
+      return ref.set({ path: path });
+    }
+    //if (snap.)
+  });
 }

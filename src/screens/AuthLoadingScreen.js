@@ -5,7 +5,8 @@ import {
   UIManager,
   Platform,
   TouchableOpacity,
-  LayoutAnimation
+  LayoutAnimation,
+  StatusBar
 } from "react-native";
 import firebase from "react-native-firebase";
 
@@ -15,7 +16,7 @@ export default class AuthLoadingScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {username:""};
+    this.state = { username: "" };
     if (Platform.OS === "android") {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
@@ -50,6 +51,11 @@ export default class AuthLoadingScreen extends Component {
           justifyContent: "center"
         }}
       >
+        <StatusBar
+          animated={true}
+          backgroundColor={color}
+          barStyle="light-content"
+        />
         <Text
           style={{
             color: colors.light,
