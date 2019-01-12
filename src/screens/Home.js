@@ -96,9 +96,7 @@ class Home extends Component {
           postInHeader={false}
           header={
             <View style={{}}>
-              {/*
               <InputBox path={path} color={color} />
-              */}
               <HomeButtons color={color} />
             </View>
           }

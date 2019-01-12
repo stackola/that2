@@ -28,14 +28,16 @@ export function getUser() {
   }
 }
 
-export function post(text, image, path) {
+export function post(text, image, path, isMessage) {
   console.log(getUser());
   console.log("GO");
-  return sendPost({ text, path, image })
+  return sendPost({ text, path, image, isMessage })
     .then(r => {
       //console.log(r);
-      doSave(r.data.newPath, true, false);
-      doSave(path, true, false);
+      if (!isMessage) {
+        doSave(path, true, false);
+        doSave(r.data.newPath, true, false);
+      }
       return r;
     })
     .catch(err => {

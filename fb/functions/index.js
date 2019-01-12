@@ -31,6 +31,7 @@ exports.post = functions.https.onCall((data, context) => {
 
   const text = data.text || null;
   const image = data.image || null;
+  const isMessage = data.isMessage || false;
   if (!text && !image) {
     return { error: "No text or image" };
   }
@@ -61,18 +62,19 @@ exports.post = functions.https.onCall((data, context) => {
         updated: admin.firestore.FieldValue.serverTimestamp()
       })
       .then(() => {
-        incrementComments(path);
-        addPostToUser(path + "/posts/" + newPost.id, uid);
-        sendNotification(
-          path,
-          "Check that",
-          u.username + " replied to a post you are following.",
-          {
-            path: path,
-            type: "reply",
-            byUser: uid
-          }
-        );
+        !isMessage && incrementComments(path);
+        !isMessage && addPostToUser(path + "/posts/" + newPost.id, uid);
+        !isMessage &&
+          sendNotification(
+            path,
+            "Check that",
+            u.username + " replied to a post you are following.",
+            {
+              path: path,
+              type: "reply",
+              byUser: uid
+            }
+          );
         return {
           status: "ok",
           postId: newPost.id,

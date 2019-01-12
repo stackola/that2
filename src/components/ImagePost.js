@@ -46,7 +46,7 @@ class Post extends PureComponent {
           onLongPress={() => {
             isImage && this.props.openOverlay(this.props.image);
           }}
-          disabled={!this.props.linkToSelf}
+          disabled={!this.props.linkToSelf || this.props.isMessage}
           onPress={() => {
             if (this.props.linkToSelf) {
               this.props.navigation.navigate({
@@ -62,19 +62,21 @@ class Post extends PureComponent {
             backgroundColor: isImage ? "hsla(0,0%,0%,0.7)" : "none"
           }}
         >
-          <View
-            style={{
-              width: 80,
-              alignItems: "center",
-              height: isHome ? 80 : 120,
-              justifyContent: "center"
-            }}
-          >
-            <Text style={{ fontSize: 25, color: this.props.color }}>
-              {this.props.comments}
-            </Text>
-            <Icon name="face" color={this.props.color} size={25} />
-          </View>
+          {!this.props.isMessage && (
+            <View
+              style={{
+                width: 80,
+                alignItems: "center",
+                height: isHome ? 80 : 120,
+                justifyContent: "center"
+              }}
+            >
+              <Text style={{ fontSize: 25, color: this.props.color }}>
+                {this.props.comments}
+              </Text>
+              <Icon name="face" color={this.props.color} size={25} />
+            </View>
+          )}
           <View
             style={{
               flex: 1,

@@ -264,6 +264,7 @@ export default class PostList extends Component {
                 return (
                   <ImagePost
                     updated={post.updated}
+                    isMessage={this.props.isMessage}
                     color={color}
                     comments={post.comments}
                     linkToSelf={true}

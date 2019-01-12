@@ -49,7 +49,12 @@ export default class InputBox extends Component {
   send() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     this.setState({ loading: true }, () => {
-      post(this.state.input, this.state.image, this.props.path).then(() => {
+      post(
+        this.state.input,
+        this.state.image,
+        this.props.path,
+        this.props.isMessage
+      ).then(() => {
         this.setState({ loading: false, input: "", image: null });
       });
     });

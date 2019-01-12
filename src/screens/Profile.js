@@ -84,7 +84,11 @@ export default class MyProfile extends Component {
                 <View style={{ flex: 1 }}>
                   <TouchableOpacity
                     onPress={() => {
-                      this.props.navigation.navigate("Chat");
+                      this.props.navigation.navigate({
+                        routeName: "Chat",
+                        params: { to: this.state.user.id },
+                        key: this.state.user.id
+                      });
                     }}
                     style={{
                       flex: 1,
