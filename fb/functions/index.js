@@ -8,19 +8,23 @@ admin.initializeApp(functions.config().firebase);
 //  response.send("Hello from Firebase!");
 // });
 
+function getUser(uid) {
+  return admin
+    .firestore()
+    .collection("users")
+    .doc(uid)
+    .get();
+}
+
 exports.post = functions.https.onCall((data, context) => {
   // Authentication / user information is automatically added to the request.
-  // const uid ="mntjlOUpd6SjfQmE1GhF820Ass62";
+  //const uid ="ygTlBOBr1iUrQtBbxkO64h981ln1";
 
   const uid = context.auth.uid;
-  const name = context.auth.token.name || null;
-  const displayName = context.auth.token.displayName || null;
-  const picture = context.auth.token.picture || null;
-  const email = context.auth.token.email || null;
 
-  if (!context.auth || !name) {
+  if (!context.auth) {
     // Throwing an HttpsError so that the client gets the error details.
-    return { error: "Not authenticated", uid, name, displayName };
+    return { error: "Not authenticated", uid };
   }
 
   // TODO: Check ban list. Check allow anonymous. Check if either home town or in raidus.
@@ -41,43 +45,47 @@ exports.post = functions.https.onCall((data, context) => {
     .doc(path)
     .collection("posts")
     .doc();
-
-  return newPost
-    .set({
-      id: newPost.id,
-      text,
-      image,
-      comments: 0,
-      parent: path,
-      user: uid,
-      name: name,
-      time: admin.firestore.FieldValue.serverTimestamp(),
-      updated: admin.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-      incrementComments(path);
-      addPostToUser(path + "/posts/" + newPost.id, name);
-      sendNotification(
-        path,
-        "Check that",
-        name + " replied to a post you are following.",
-        {
-          path: path,
-          type: "reply",
-          byUser: uid
-        }
-      );
-      return {
-        status: "ok",
-        postId: newPost.id,
-        newPath: path + "/posts/" + newPost.id
-      };
-    });
+  return getUser(uid).then(u => {
+    console.log(u);
+    u = u.data();
+    return newPost
+      .set({
+        id: newPost.id,
+        text,
+        image,
+        comments: 0,
+        parent: path,
+        user: uid,
+        name: u.username,
+        time: admin.firestore.FieldValue.serverTimestamp(),
+        updated: admin.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        incrementComments(path);
+        addPostToUser(path + "/posts/" + newPost.id, uid);
+        sendNotification(
+          path,
+          "Check that",
+          u.username + " replied to a post you are following.",
+          {
+            path: path,
+            type: "reply",
+            byUser: uid
+          }
+        );
+        return {
+          status: "ok",
+          postId: newPost.id,
+          newPath: path + "/posts/" + newPost.id
+        };
+      });
+  });
 });
-function addPostToUser(path, username) {
+function addPostToUser(path, uid) {
   return admin
     .firestore()
-    .doc("users/" + username)
+    .collection("users")
+    .doc(uid)
     .collection("posts")
     .doc()
     .set({ path: path, time: admin.firestore.FieldValue.serverTimestamp() });
@@ -125,3 +133,21 @@ function getPathId(p) {
   let a = p.split("/");
   return a[a.length - 1];
 }
+
+exports.createUser = functions.firestore
+  .document("users/{userId}")
+  .onCreate((snap, context) => {
+    // Get an object representing the document
+    // e.g. {'name': 'Marie', 'age': 66}
+    const newValue = snap.data();
+
+    // access a particular field as you would any JS property
+    let username = newValue.username.trim();
+    username = username.toLowerCase();
+    var db = admin.firestore();
+    return db
+      .collection("usernames")
+      .doc(username)
+      .set({ taken: true });
+    // perform desired operations ...
+  });

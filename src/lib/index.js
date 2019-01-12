@@ -14,6 +14,12 @@ export function getUID() {
   }
 }
 
+export function getDoc(path) {
+  return firebase
+    .firestore()
+    .doc(path)
+    .get();
+}
 export function getUser() {
   if (firebase.auth().currentUser !== null) {
     return firebase.auth().currentUser;
@@ -141,29 +147,54 @@ export function report(path, reason, moreInfo) {
     .set(r);
 }
 
+function isFree(username) {
+  return firebase
+    .firestore()
+    .collection("usernames")
+    .doc(username)
+    .get()
+    .then(d => {
+      if (d.exists) {
+        //username already taken.
+        return false;
+      } else {
+        return true;
+      }
+    });
+}
+
 export function makeUser(u) {
-  u = { ...u, id: getUID() };
-  if (u.username) {
-    return firebase
-      .firestore()
-      .collection("users")
-      .doc(u.username)
-      .set(u);
-  } else {
+  if (!u.username) {
     return Promise.reject();
   }
+  return isFree(u.username).then(ans => {
+    if (!ans) {
+      return Promise.reject();
+    } else {
+      u = {
+        ...u,
+        id: getUID(),
+        time: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      console.log(u);
+      return firebase
+        .firestore()
+        .collection("users")
+        .doc(getUID())
+        .set(u);
+    }
+  });
 }
 function getPathId(p) {
   let a = p.split("/");
   return a[a.length - 1];
 }
 export function doSave(path, onlySave, showToast = true) {
-  let user = getUser();
-  let username = user.displayName;
+  let uid = getUID();
   let ref = firebase
     .firestore()
     .collection("users")
-    .doc(username)
+    .doc(uid)
     .collection("saved")
     .doc(getPathId(path));
 

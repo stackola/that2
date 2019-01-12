@@ -19,7 +19,6 @@ export default class Home extends Component {
 
     this.state = {
       username: "",
-      token: null,
       error: false,
       notificationPermissions: null,
       notificationsEnabled: false
@@ -34,22 +33,10 @@ export default class Home extends Component {
       let username = this.state.username;
       makeUser({
         username: username,
-        notificationsEnabled: this.state.notificationsEnabled,
-        token: this.state.token
+        notificationsEnabled: this.state.notificationsEnabled
       })
         .then(r => {
-          let user = firebase.auth().currentUser;
-          user
-            .updateProfile({
-              displayName: username
-            })
-            .then(() => {
-              user.getIdToken(true).then(() => {
-                let user = firebase.auth().currentUser;
-
-                this.props.navigation.navigate("App");
-              });
-            });
+          this.props.navigation.navigate("App");
         })
         .catch(err => {
           console.log(err);
@@ -58,55 +45,49 @@ export default class Home extends Component {
         });
     });
   }
-  componentDidMount() {
-    var user = firebase.auth().currentUser;
-    this.setState({ username: user ? user.name : "" }, () => {
-      firebase
-        .messaging()
-        .hasPermission()
-        .then(enabled => {
-          if (enabled) {
-            this.setState({ notificationPermissions: true }, () => {
-              //this.setToken();
-            });
-          } else {
-            firebase
-              .messaging()
-              .requestPermission()
-              .then(() => {
-                this.setState({ notificationPermissions: true }, () => {
-                  //this.setToken();
-                });
-              })
-              .catch(error => {
-                // User has rejected permissions
-              });
-          }
-        });
-    });
-    const channel = new firebase.notifications.Android.Channel(
-      "test-channel",
-      "Test Channel",
-      firebase.notifications.Android.Importance.Max
-    ).setDescription("My apps test channel");
-    firebase.notifications().android.createChannel(channel);
-    console.log(user);
-  }
+  componentDidMount() {}
 
-  setToken() {
+  turnOnNotifications() {
     firebase
       .messaging()
-      .getToken()
-      .then(t => {
-        this.setState({ token: t });
+      .hasPermission()
+      .then(enabled => {
+        if (enabled) {
+          this.setState({ notificationPermissions: true }, () => {
+            this.enableNotifications();
+          });
+        } else {
+          firebase
+            .messaging()
+            .requestPermission()
+            .then(() => {
+              this.setState({ notificationPermissions: true }, () => {
+                this.enableNotifications();
+              });
+            })
+            .catch(error => {
+              // User has rejected permissions
+            });
+        }
       });
   }
   enableNotifications() {
     this.setState({ notificationsEnabled: true }, () => {
       //this.setToken();
+      const channel = new firebase.notifications.Android.Channel(
+        "test-channel",
+        "Test Channel",
+        firebase.notifications.Android.Importance.Max
+      ).setDescription("My apps test channel");
+      firebase.notifications().android.createChannel(channel);
     });
   }
-
+  disableNotifications() {
+    this.setState({ notificationsEnabled: false }, () => {
+      //this.setToken();
+      firebase.notifications().android.deleteChannel("test-channel");
+    });
+  }
   render() {
     let color = this.state.username ? getColor(this.state.username) : "#1E88E5";
     return !this.state.loading ? (
@@ -153,10 +134,11 @@ export default class Home extends Component {
             backgroundColor: colors.darkTransparent
           }}
         />
-        {!this.state.notificationsEnabled && (
+        {(!this.state.notificationsEnabled ||
+          !this.state.notificationPermissions) && (
           <TouchableOpacity
             onPress={() => {
-              this.enableNotifications();
+              this.turnOnNotifications();
             }}
             style={{
               height: 50,
@@ -171,7 +153,10 @@ export default class Home extends Component {
           </TouchableOpacity>
         )}
         {this.state.notificationsEnabled && this.state.notificationPermissions && (
-          <View
+          <TouchableOpacity
+            onPress={() => {
+              this.disableNotifications();
+            }}
             style={{
               height: 50,
               fontSize: 18,
@@ -182,21 +167,7 @@ export default class Home extends Component {
             }}
           >
             <Text style={{ color: colors.light }}>Notifications enabled</Text>
-          </View>
-        )}
-        {this.state.notificationsEnabled && !this.state.token && (
-          <View
-            style={{
-              height: 50,
-              fontSize: 18,
-              backgroundColor: colors.darkTransparent,
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: 8
-            }}
-          >
-            <Text style={{ color: colors.light }}>ERROR: No Token</Text>
-          </View>
+          </TouchableOpacity>
         )}
         <TouchableOpacity
           onPress={() => {

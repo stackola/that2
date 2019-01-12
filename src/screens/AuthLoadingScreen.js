@@ -11,7 +11,7 @@ import {
 import firebase from "react-native-firebase";
 
 import colors from "That/src/colors";
-import { getColor } from "That/src/lib";
+import { getColor, getUser, getDoc } from "That/src/lib";
 export default class AuthLoadingScreen extends Component {
   constructor(props) {
     super(props);
@@ -27,14 +27,18 @@ export default class AuthLoadingScreen extends Component {
       .auth()
       .signInAnonymously()
       .then(() => {
-        var user = firebase.auth().currentUser;
-        if (!user.displayName) {
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          this.props.navigation.navigate("Auth");
-          return;
-        }
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        this.props.navigation.navigate("App");
+        var user = getUser();
+        getDoc("users/" + user.uid).then(snap => {
+          console.log("got user snap", snap);
+          if (snap.exists) {
+            ///user has account.
+            this.props.navigation.navigate("App");
+          } else {
+            ///user has no account;
+            this.props.navigation.navigate("Auth");
+            return;
+          }
+        });
       });
   }
 

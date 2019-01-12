@@ -18,13 +18,12 @@ export function setSubs(subs) {
 }
 
 export function userSubscribe(cb) {
-  var user = firebase.auth().currentUser;
-  let username = user.displayName;
+  let uid = firebase.auth().currentUser.uid;
   return (dispatch, getState) => {
     firebase
       .firestore()
       .collection("users")
-      .doc(username)
+      .doc(uid)
       .collection("saved")
       .onSnapshot(doc => {
         console.log(doc);

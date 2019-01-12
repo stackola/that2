@@ -99,7 +99,10 @@ class Post extends PureComponent {
                   onPress={() => {
                     this.props.navigation.navigate({
                       routeName: "Profile",
-                      params: { username: this.props.username },
+                      params: {
+                        username: this.props.username,
+                        uid: this.props.userId
+                      },
                       key: this.props.username
                     });
                   }}

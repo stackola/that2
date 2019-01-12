@@ -53,6 +53,7 @@ export default class PostList extends Component {
       .then(snap => {
         //console.log(snap);
         if (snap._docs.length == 0) {
+          this.props.reSort !== false && this.subscribeToNewest();
           this.setState({ hasMore: false, refreshing: false });
           return;
         }

@@ -19,8 +19,6 @@ import { getColor, getUID } from "That/src/lib";
 
 class Home extends Component {
   componentDidMount() {
-    var user = firebase.auth().currentUser;
-    console.log(user);
     this.props.userSubscribe(() => {});
     this.notificationListener = firebase
       .notifications()

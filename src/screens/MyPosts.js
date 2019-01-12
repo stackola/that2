@@ -34,8 +34,8 @@ export default class MyProfile extends Component {
   }
 
   render() {
-    let username = getUser().displayName;
-    let color = getColor(username);
+    let uid = getUser().uid;
+    let color = getColor(uid);
     return (
       <View style={{ flex: 1, backgroundColor: color, paddingTop: 4 }}>
         <StatusBar
@@ -47,7 +47,7 @@ export default class MyProfile extends Component {
 
         <PostList
           color={color}
-          path={"users/" + username}
+          path={"users/" + uid}
           collection={"saved"}
           header={<View />}
           reSort={false}
