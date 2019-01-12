@@ -34,7 +34,7 @@ export default class MyProfile extends Component {
   }
 
   render() {
-    let username = getUser().displayName;
+    let username = this.props.navigation.getParam("username", null);
     let color = getColor(username);
     return (
       <View style={{ flex: 1, backgroundColor: color, paddingTop: 4 }}>
@@ -46,11 +46,47 @@ export default class MyProfile extends Component {
         <Header path={"report"} hideWatch={true} hideHome={true} />
 
         <PostList
+          header={
+            <View
+              style={{
+                flexDirection: "row",
+                paddingRight: 8,
+                paddingLeft: 8,
+                paddingBottom: 4,
+                height: 80
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{ color: colors.light, marginBottom: 0, fontSize: 20 }}
+                >
+                  {username}
+                </Text>
+                <Text style={{ color: colors.light, marginBottom: 12 }}>
+                  Joined 2 days ago
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.props.navigation.navigate("Chat");
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: colors.light,
+                    borderRadius: 2,
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Icon name="envelope" color={color} size={30} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          }
           color={color}
           path={"users/" + username}
-          collection={"saved"}
-          header={<View />}
-          reSort={false}
+          collection={"posts"}
           sort={"time"}
           pathExtractor={c => {
             return c._document._data.path;

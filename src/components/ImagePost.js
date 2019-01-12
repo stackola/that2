@@ -94,7 +94,16 @@ class Post extends PureComponent {
             </Text>
             {!isHome && !this.props.isBaseGroup && (
               <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity style={{ flex: 1 }}>
+                <TouchableOpacity
+                  style={{ flex: 1 }}
+                  onPress={() => {
+                    this.props.navigation.navigate({
+                      routeName: "Profile",
+                      params: { username: this.props.username },
+                      key: this.props.username
+                    });
+                  }}
+                >
                   <Text
                     style={{
                       color: isImage ? colors.light : colors.text,

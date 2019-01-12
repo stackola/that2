@@ -6,9 +6,9 @@ import colors from "../colors";
 function Button(props) {
   return (
     <TouchableOpacity
-    onPress={()=>{
-      props.onPress();
-    }}
+      onPress={() => {
+        props.onPress();
+      }}
       style={{
         flex: 1,
         height: 40,
@@ -24,10 +24,10 @@ function Button(props) {
 }
 
 export class HomeButtons extends Component {
-  toProfile(){
+  toProfile() {
     this.props.navigation.navigate("MyProfile");
   }
-  toPosts(){
+  toPosts() {
     this.props.navigation.navigate("MyPosts");
   }
   render() {
@@ -40,9 +40,21 @@ export class HomeButtons extends Component {
           flexDirection: "row"
         }}
       >
-        <Button color={this.props.color} text={"My profile"} onPress={()=>{this.toProfile()}}/>
+        <Button
+          color={this.props.color}
+          text={"My profile"}
+          onPress={() => {
+            this.toProfile();
+          }}
+        />
         <View style={{ width: 4 }} />
-        <Button color={this.props.color} text={"Watched posts"}  onPress={()=>{this.toPosts()}}/>
+        <Button
+          color={this.props.color}
+          text={"Watched posts"}
+          onPress={() => {
+            this.toPosts();
+          }}
+        />
       </View>
     );
   }

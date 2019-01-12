@@ -6,6 +6,7 @@ import {
   Platform,
   UIManager,
   LayoutAnimation,
+  ActivityIndicator,
   RefreshControl
 } from "react-native";
 import colors from "That/src/colors";
@@ -16,10 +17,10 @@ import ImagePost from "That/src/components/ImagePost";
 export default class PostList extends Component {
   constructor(props) {
     super(props);
-    this.hasMore=true;
     this.state = {
-      reloadKey:1,
-      items: []
+      reloadKey: 1,
+      items: [],
+      hasMore: true
     };
     if (Platform.OS === "android") {
       UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -45,18 +46,24 @@ export default class PostList extends Component {
     this.initialize();
     //initialize subscription to first object
   }
-  initialize(){
+  initialize(refreshing) {
     console.log("post list mounted!");
     let coll = this.props.collection || "posts";
     getPosts(this.props.path, 10, coll, this.props.sort || "updated")
       .then(snap => {
         //console.log(snap);
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        if (snap._docs.length == 0) {
+          this.setState({ hasMore: false, refreshing: false });
+          return;
+        }
+        refreshing &&
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         this.setState(
           s => {
             console.log(snap);
             return {
               ...s,
+              refreshing: false,
               items: snap._docs.map(d => {
                 return d;
               })
@@ -71,7 +78,6 @@ export default class PostList extends Component {
       .catch(err => {
         console.log(err);
       });
-
   }
   extractInitialPath(c) {
     if (this.props.initialPathExtractor) {
@@ -118,19 +124,24 @@ export default class PostList extends Component {
   }
   endReached() {
     //if we are in real time mode, just ask for 10 more from the db after the current last one.
-    if (!this.hasMore){
+    if (!this.state.hasMore) {
       console.log("not getting more");
       return;
     }
     console.log("getting more");
     let coll = this.props.collection || "posts";
-    console.log("end reached", this.state.items[this.state.items.length-1]);
-    getPosts(this.props.path, 10, coll, this.props.sort || "updated", this.state.items[this.state.items.length-1])
+    console.log("end reached", this.state.items[this.state.items.length - 1]);
+    getPosts(
+      this.props.path,
+      10,
+      coll,
+      this.props.sort || "updated",
+      this.state.items[this.state.items.length - 1]
+    )
       .then(snap => {
         console.log(snap);
-        if (snap._docs.length==0){
-          //end reached.
-          this.hasMore=false;
+        if (snap._docs.length == 0) {
+          this.setState({ hasMore: false });
           return;
         }
         this.setState(
@@ -138,10 +149,7 @@ export default class PostList extends Component {
             console.log(snap);
             return {
               ...s,
-              items: [
-                ...s.items,
-                ...snap._docs
-              ]
+              items: [...s.items, ...snap._docs]
             };
           },
           () => {
@@ -153,11 +161,11 @@ export default class PostList extends Component {
         console.log(err);
       });
   }
-  refresh(){
+  refresh() {
     this.sub1 && this.sub1();
-   
-    this.initialize();
-
+    this.setState({ refreshing: true }, () => {
+      this.initialize(true);
+    });
   }
   render() {
     let color = this.props.color;
@@ -165,14 +173,47 @@ export default class PostList extends Component {
     //consoconsole.log(path);
     return (
       <FlatList
-        key={path+this.state.reloadKey.toString()}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={(()=>{this.refresh()})}/>}
+        key={path + this.state.reloadKey.toString()}
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={() => {
+              this.refresh();
+            }}
+          />
+        }
         onEndReached={() => {
           this.endReached();
         }}
-        onEndReachedThreshold={0.01}
+        onEndReachedThreshold={0.05}
         keyboardShouldPersistTaps={"handled"}
-        ListFooterComponent={this.props.footer}
+        ListFooterComponent={
+          <View>
+            {!this.state.hasMore && (
+              <View
+                style={{
+                  height: 60,
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <Text>You have reached the end</Text>
+              </View>
+            )}
+            {this.state.hasMore && (
+              <View
+                style={{
+                  height: 60,
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <ActivityIndicator />
+              </View>
+            )}
+            {this.props.footer}
+          </View>
+        }
         ListHeaderComponent={
           this.props.header ? (
             this.props.header
@@ -214,7 +255,7 @@ export default class PostList extends Component {
         data={this.state.items}
         renderItem={i => {
           let p = i.item._data;
-          let tp = this.extractInitialPath(i.item)
+          let tp = this.extractInitialPath(i.item);
           console.log(p);
           return (
             <PostLoader color={color} path={tp} realtime={true}>

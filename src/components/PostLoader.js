@@ -1,11 +1,10 @@
 import React, { PureComponent } from "react";
 import firebase from "react-native-firebase";
-import Loading from "That/src/components/Loading"
+import Loading from "That/src/components/Loading";
 export default class ItemLoader extends PureComponent {
   constructor(p) {
     super(p);
     this.state = { loading: true, item: null };
-   
   }
   subscribeToChanges() {
     ///console.log("GOTTA SUB!");
@@ -50,7 +49,7 @@ export default class ItemLoader extends PureComponent {
     ) : this.props.loading == false ? null : this.props.loadingComponent ? (
       this.props.loadingComponent
     ) : (
-      <Loading/>
+      <Loading />
     );
   }
 }

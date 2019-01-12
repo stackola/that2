@@ -19,6 +19,9 @@ service cloud.firestore {
     match /groups/{allDocuments=**}{
       allow read: if true;
     }
+     match /messages/{threat=**} {
+      allow read: if request.auth.token.name in resource.data.users;
+    }
     match /reports/{report}{
       allow create: if true;
     }

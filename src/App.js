@@ -7,10 +7,12 @@ import {
 } from "react-navigation";
 import Home from "./screens/Home";
 import Details from "./screens/Details";
+import Chat from "./screens/Chat";
 import Report from "./screens/Report";
 import SignInScreen from "./screens/SignInScreen";
 import MyPosts from "./screens/MyPosts";
 import MyProfile from "./screens/MyProfile";
+import Profile from "./screens/Profile";
 import AuthLoadingScreen from "./screens/AuthLoadingScreen";
 
 import { OverlayProvider } from "./components/overlay/";
@@ -35,7 +37,9 @@ const AppStack = createStackNavigator(
     Details: Details,
     Report: Report,
     MyProfile: MyProfile,
+    Profile: Profile,
     MyPosts: MyPosts,
+    Chat: Chat
     /*
   SingleComment: SingleComment,
   Events: Events,
