@@ -15,7 +15,47 @@ function getUser(uid) {
     .doc(uid)
     .get();
 }
+function sendMessageNotification(to, text, data, title) {
+  let topic = "messages-to-" + to;
+  return admin
+    .messaging()
+    .send({
+      topic: topic,
+      data: data || {},
+      android: { notification: { channelId: "test-channel" } },
+      notification: {
+        title: title,
+        body: text
+      }
+    })
+    .then(() => {
+      console.log("notification dispatched!");
+      return;
+    })
+    .catch(err => {
+      console.log("err", err);
+    });
+}
 
+function messNotiHelper(path, from) {
+  let text = "You have a new private message on that.";
+  let title = "New message";
+  admin
+    .firestore()
+    .doc(path)
+    .get()
+    .then(s => {
+      let to = s.data().users.filter(i => {
+        return i != from;
+      })[0];
+      sendMessageNotification(
+        to,
+        text,
+        { type: "message", messageFrom: from },
+        title
+      );
+    });
+}
 exports.post = functions.https.onCall((data, context) => {
   // Authentication / user information is automatically added to the request.
   //const uid ="ygTlBOBr1iUrQtBbxkO64h981ln1";
@@ -62,8 +102,9 @@ exports.post = functions.https.onCall((data, context) => {
         updated: admin.firestore.FieldValue.serverTimestamp()
       })
       .then(() => {
-        !isMessage && incrementComments(path);
+        incrementComments(path);
         !isMessage && addPostToUser(path + "/posts/" + newPost.id, uid);
+        isMessage && messNotiHelper(path, uid);
         !isMessage &&
           sendNotification(
             path,

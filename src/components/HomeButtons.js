@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Text, View, TouchableOpacity } from "react-native";
 import { withNavigation } from "react-navigation";
 import colors from "../colors";
+import { getUID } from "That/src/lib";
 
 function Button(props) {
   return (
@@ -24,8 +25,14 @@ function Button(props) {
 }
 
 export class HomeButtons extends Component {
+  toMessages() {
+    this.props.navigation.navigate("Chats");
+  }
   toProfile() {
-    this.props.navigation.navigate("MyProfile");
+    this.props.navigation.navigate({
+      routeName: "Profile",
+      params: { uid: getUID() }
+    });
   }
   toPosts() {
     this.props.navigation.navigate("MyPosts");
@@ -45,6 +52,14 @@ export class HomeButtons extends Component {
           text={"My profile"}
           onPress={() => {
             this.toProfile();
+          }}
+        />
+        <View style={{ width: 4 }} />
+        <Button
+          color={this.props.color}
+          text={"Messages"}
+          onPress={() => {
+            this.toMessages();
           }}
         />
         <View style={{ width: 4 }} />

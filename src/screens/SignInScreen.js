@@ -13,6 +13,7 @@ import {
 import firebase from "react-native-firebase";
 import colors from "That/src/colors";
 import { getColor, makeUser } from "That/src/lib";
+import { getUID } from "../lib";
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -76,16 +77,22 @@ export default class Home extends Component {
       //this.setToken();
       const channel = new firebase.notifications.Android.Channel(
         "test-channel",
-        "Test Channel",
+        "General",
         firebase.notifications.Android.Importance.Max
-      ).setDescription("My apps test channel");
+      ).setDescription("General Notifications like replies");
+
       firebase.notifications().android.createChannel(channel);
+      firebase.messaging().subscribeToTopic("messages-to-" + getUID());
     });
   }
   disableNotifications() {
     this.setState({ notificationsEnabled: false }, () => {
       //this.setToken();
       firebase.notifications().android.deleteChannel("test-channel");
+      firebase
+        .messaging()
+        .unsubscribeFromTopic("messages-to-" + getUID())
+        .then(r => {});
     });
   }
   render() {

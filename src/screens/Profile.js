@@ -43,6 +43,7 @@ export default class MyProfile extends Component {
   render() {
     let username = this.props.navigation.getParam("username", null);
     let uid = this.props.navigation.getParam("uid", null);
+    let isSelf = uid == getUID();
     let color = getColor(username);
     return (
       <View style={{ flex: 1, backgroundColor: color, paddingTop: 4 }}>
@@ -82,24 +83,26 @@ export default class MyProfile extends Component {
                   </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.props.navigation.navigate({
-                        routeName: "Chat",
-                        params: { to: this.state.user.id },
-                        key: this.state.user.id
-                      });
-                    }}
-                    style={{
-                      flex: 1,
-                      backgroundColor: colors.light,
-                      borderRadius: 2,
-                      alignItems: "center",
-                      justifyContent: "center"
-                    }}
-                  >
-                    <Icon name="envelope" color={color} size={30} />
-                  </TouchableOpacity>
+                  {!isSelf && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        this.props.navigation.navigate({
+                          routeName: "Chat",
+                          params: { to: this.state.user.id },
+                          key: this.state.user.id
+                        });
+                      }}
+                      style={{
+                        flex: 1,
+                        backgroundColor: colors.light,
+                        borderRadius: 2,
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}
+                    >
+                      <Icon name="envelope" color={color} size={30} />
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
             ) : (

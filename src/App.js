@@ -7,11 +7,11 @@ import {
 } from "react-navigation";
 import Home from "./screens/Home";
 import Details from "./screens/Details";
+import Chats from "./screens/Chats";
 import Chat from "./screens/Chat";
 import Report from "./screens/Report";
 import SignInScreen from "./screens/SignInScreen";
 import MyPosts from "./screens/MyPosts";
-import MyProfile from "./screens/MyProfile";
 import Profile from "./screens/Profile";
 import AuthLoadingScreen from "./screens/AuthLoadingScreen";
 
@@ -36,10 +36,10 @@ const AppStack = createStackNavigator(
     Home: Home,
     Details: Details,
     Report: Report,
-    MyProfile: MyProfile,
     Profile: Profile,
     MyPosts: MyPosts,
-    Chat: Chat
+    Chat: Chat,
+    Chats: Chats
     /*
   SingleComment: SingleComment,
   Events: Events,

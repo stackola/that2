@@ -61,7 +61,7 @@ export default class PostList extends Component {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         this.setState(
           s => {
-            console.log(snap);
+            //console.log(snap);
             return {
               ...s,
               refreshing: false,
@@ -131,7 +131,7 @@ export default class PostList extends Component {
     }
     console.log("getting more");
     let coll = this.props.collection || "posts";
-    console.log("end reached", this.state.items[this.state.items.length - 1]);
+    //console.log("end reached", this.state.items[this.state.items.length - 1]);
     getPosts(
       this.props.path,
       10,
@@ -140,14 +140,14 @@ export default class PostList extends Component {
       this.state.items[this.state.items.length - 1]
     )
       .then(snap => {
-        console.log(snap);
+        //console.log(snap);
         if (snap._docs.length == 0) {
           this.setState({ hasMore: false });
           return;
         }
         this.setState(
           s => {
-            console.log(snap);
+            //console.log(snap);
             return {
               ...s,
               items: [...s.items, ...snap._docs]
@@ -257,7 +257,7 @@ export default class PostList extends Component {
         renderItem={i => {
           let p = i.item._data;
           let tp = this.extractInitialPath(i.item);
-          console.log(p);
+          //console.log(p);
           return (
             <PostLoader color={color} path={tp} realtime={true}>
               {post => {

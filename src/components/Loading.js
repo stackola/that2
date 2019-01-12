@@ -16,7 +16,7 @@ export default class Loading extends Component {
           borderRadius: 2,
           alignItems: "center",
           justifyContent: "center",
-          minHeight: 120
+          minHeight: this.props.height || 120
         }}
       >
         <ActivityIndicator />

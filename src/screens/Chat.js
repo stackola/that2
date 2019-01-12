@@ -18,7 +18,21 @@ export default class Details extends Component {
   getPath(from, to) {
     return [from, to].sort().join("-");
   }
-
+  loadOrMakeChat() {
+    let from = getUID();
+    let to = this.props.navigation.getParam("to", null);
+    let path = this.getPath(from, to);
+    firebase
+      .firestore()
+      .collection("messages")
+      .doc(path)
+      .set({
+        users: [from, to],
+        time: firebase.firestore.FieldValue.serverTimestamp(),
+        updated: firebase.firestore.FieldValue.serverTimestamp(),
+        comments: 0
+      });
+  }
   componentDidMount() {
     //console.log(user);
     let from = getUID();
@@ -27,7 +41,7 @@ export default class Details extends Component {
       console.log(s);
       this.setState({ user: s._data });
     });
-    //this.loadOrMakeChat();
+    this.loadOrMakeChat();
   }
 
   render() {

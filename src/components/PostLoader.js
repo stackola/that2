@@ -49,7 +49,7 @@ export default class ItemLoader extends PureComponent {
     ) : this.props.loading == false ? null : this.props.loadingComponent ? (
       this.props.loadingComponent
     ) : (
-      <Loading />
+      <Loading height={this.props.height || 120} />
     );
   }
 }

@@ -73,6 +73,13 @@ class Home extends Component {
         key: data.path
       });
     }
+    if (data.type == "message") {
+      console.log("message clicked!");
+      this.props.navigation.navigate({
+        routeName: "Chat",
+        params: { to: data.messageFrom }
+      });
+    }
   }
   componentWillUnmount() {
     this.notificationListener();
@@ -96,7 +103,7 @@ class Home extends Component {
           postInHeader={false}
           header={
             <View style={{}}>
-              <InputBox path={path} color={color} />
+              {/*<InputBox path={path} color={color} />*/}
               <HomeButtons color={color} />
             </View>
           }
