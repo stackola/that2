@@ -21,6 +21,7 @@ var colors = {
   female: "#ff479a",
   otherGenders: "#a3a3a3",
   postBackground: "#171717",
-  light: "#f7f7f7"
+  light: "#f7f7f7",
+  darkTransparent:"hsla(0,0%,0%,0.2)",
 };
 export default colors;

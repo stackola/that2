@@ -150,7 +150,7 @@ export default class Home extends Component {
 
             height: 50,
             color: colors.light,
-            backgroundColor: "hsla(0,0%,0%,0.2)"
+            backgroundColor: colors.darkTransparent
           }}
         />
         {!this.state.notificationsEnabled && (
@@ -161,7 +161,7 @@ export default class Home extends Component {
             style={{
               height: 50,
               fontSize: 18,
-              backgroundColor: "hsla(0,0%,0%,0.2)",
+              backgroundColor: colors.darkTransparent,
               alignItems: "center",
               justifyContent: "center",
               marginTop: 8
@@ -175,7 +175,7 @@ export default class Home extends Component {
             style={{
               height: 50,
               fontSize: 18,
-              backgroundColor: "hsla(0,0%,0%,0.2)",
+              backgroundColor: colors.darkTransparent,
               alignItems: "center",
               justifyContent: "center",
               marginTop: 8
@@ -189,7 +189,7 @@ export default class Home extends Component {
             style={{
               height: 50,
               fontSize: 18,
-              backgroundColor: "hsla(0,0%,0%,0.2)",
+              backgroundColor: colors.darkTransparent,
               alignItems: "center",
               justifyContent: "center",
               marginTop: 8

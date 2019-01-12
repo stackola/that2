@@ -56,6 +56,7 @@ exports.post = functions.https.onCall((data, context) => {
     })
     .then(() => {
       incrementComments(path);
+      addPostToUser(path + "/posts/" + newPost.id, name);
       sendNotification(
         path,
         "Check that",
@@ -73,7 +74,14 @@ exports.post = functions.https.onCall((data, context) => {
       };
     });
 });
-
+function addPostToUser(path, username) {
+  return admin
+    .firestore()
+    .doc("users/" + username)
+    .collection("posts")
+    .doc()
+    .set({ path: path, time: admin.firestore.FieldValue.serverTimestamp() });
+}
 function incrementComments(path) {
   var db = admin.firestore();
   let ref = db.doc(path);

@@ -12,6 +12,8 @@ import {
 import firebase from "react-native-firebase";
 import colors from "That/src/colors";
 import PostList from "That/src/components/PostList";
+import HomeButtons from "That/src/components/HomeButtons";
+import InputBox from "That/src/components/InputBox";
 import Header from "That/src/components/Header";
 import { getColor, getUID } from "That/src/lib";
 
@@ -94,6 +96,14 @@ class Home extends Component {
           path={path}
           canPost={true}
           postInHeader={false}
+          header={
+            <View style={{}}>
+              {/*
+              <InputBox path={path} color={color} />
+              */}
+              <HomeButtons color={color} />
+            </View>
+          }
           isHome={true}
           footer={
             <TouchableOpacity

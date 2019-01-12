@@ -5,7 +5,8 @@ import {
   FlatList,
   Platform,
   UIManager,
-  LayoutAnimation
+  LayoutAnimation,
+  RefreshControl
 } from "react-native";
 import colors from "That/src/colors";
 import { getPosts, subTo } from "That/src/lib";
@@ -15,8 +16,9 @@ import ImagePost from "That/src/components/ImagePost";
 export default class PostList extends Component {
   constructor(props) {
     super(props);
-
+    this.hasMore=true;
     this.state = {
+      reloadKey:1,
       items: []
     };
     if (Platform.OS === "android") {
@@ -24,15 +26,15 @@ export default class PostList extends Component {
     }
   }
 
-  addNew(path) {
+  addNew(item) {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     this.setState(s => {
       return {
         ...s,
         items: [
-          path,
+          item,
           ...s.items.filter(i => {
-            return i != path;
+            return i.id != item.id;
           })
         ]
       };
@@ -40,21 +42,29 @@ export default class PostList extends Component {
   }
   componentDidMount() {
     // get 10 times.
-    getPosts(this.props.path, 10)
+    this.initialize();
+    //initialize subscription to first object
+  }
+  initialize(){
+    console.log("post list mounted!");
+    let coll = this.props.collection || "posts";
+    getPosts(this.props.path, 10, coll, this.props.sort || "updated")
       .then(snap => {
         //console.log(snap);
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         this.setState(
           s => {
+            console.log(snap);
             return {
               ...s,
               items: snap._docs.map(d => {
-                return d._ref.path;
+                return d;
               })
             };
           },
           () => {
             //console.log(this.state);
-            this.subscribeToNewest();
+            this.props.reSort !== false && this.subscribeToNewest();
           }
         );
       })
@@ -62,18 +72,34 @@ export default class PostList extends Component {
         console.log(err);
       });
 
-    //initialize subscription to first object
   }
-
-  loadMore() {}
-
+  extractInitialPath(c) {
+    if (this.props.initialPathExtractor) {
+      return this.props.initialPathExtractor(c);
+    } else {
+      return c._ref.path;
+    }
+  }
+  extractPath(c) {
+    if (this.props.pathExtractor) {
+      return this.props.pathExtractor(c);
+    } else {
+      return c._document._ref.path;
+    }
+  }
   subscribeToNewest() {
-    this.sub1 = subTo(this.props.path, 1).onSnapshot(i => {
+    let coll = this.props.collection || "posts";
+    this.sub1 = subTo(
+      this.props.path,
+      1,
+      coll,
+      this.props.sort || "updated"
+    ).onSnapshot(i => {
       i._changes.map(c => {
         //console.log(c);
         if (c.type == "added") {
           //console.log("adding", c._document._ref.path);
-          this.addNew(c._document._ref.path);
+          this.addNew(c._document);
         }
       });
     });
@@ -90,53 +116,108 @@ export default class PostList extends Component {
 
     return path.split("/").length < 5;
   }
+  endReached() {
+    //if we are in real time mode, just ask for 10 more from the db after the current last one.
+    if (!this.hasMore){
+      console.log("not getting more");
+      return;
+    }
+    console.log("getting more");
+    let coll = this.props.collection || "posts";
+    console.log("end reached", this.state.items[this.state.items.length-1]);
+    getPosts(this.props.path, 10, coll, this.props.sort || "updated", this.state.items[this.state.items.length-1])
+      .then(snap => {
+        console.log(snap);
+        if (snap._docs.length==0){
+          //end reached.
+          this.hasMore=false;
+          return;
+        }
+        this.setState(
+          s => {
+            console.log(snap);
+            return {
+              ...s,
+              items: [
+                ...s.items,
+                ...snap._docs
+              ]
+            };
+          },
+          () => {
+            //console.log(this.state);
+          }
+        );
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+  refresh(){
+    this.sub1 && this.sub1();
+   
+    this.initialize();
 
+  }
   render() {
     let color = this.props.color;
     let path = this.props.path;
+    //consoconsole.log(path);
     return (
       <FlatList
+        key={path+this.state.reloadKey.toString()}
+        refreshControl={<RefreshControl refreshing={false} onRefresh={(()=>{this.refresh()})}/>}
+        onEndReached={() => {
+          this.endReached();
+        }}
+        onEndReachedThreshold={0.01}
         keyboardShouldPersistTaps={"handled"}
         ListFooterComponent={this.props.footer}
         ListHeaderComponent={
-          <View>
-            {this.props.postInHeader !== false && (
-              <PostLoader color={color} path={path} realtime={true}>
-                {post => {
-                  return (
-                    <ImagePost
-                      updated={post.updated}
-                      color={color}
-                      comments={post.comments}
-                      linkToSelf={true}
-                      path={post.parent + "/posts/" + post.id}
-                      time={post.time}
-                      text={post.text}
-                      isHeader={true}
-                      isBaseGroup={this.isBaseGroup()}
-                      image={post.image ? post.image.url : null}
-                      isHome={this.props.isHome}
-                      username={post.name}
-                      userId={post.user}
-                    />
-                  );
-                }}
-              </PostLoader>
-            )}
-            {this.props.canPost !== false && (
-              <InputBox path={path} color={color} />
-            )}
-          </View>
+          this.props.header ? (
+            this.props.header
+          ) : (
+            <View>
+              {this.props.postInHeader !== false && (
+                <PostLoader color={color} path={path} realtime={true}>
+                  {post => {
+                    return (
+                      <ImagePost
+                        updated={post.updated}
+                        color={color}
+                        comments={post.comments}
+                        linkToSelf={true}
+                        path={post.parent + "/posts/" + post.id}
+                        time={post.time}
+                        text={post.text}
+                        isHeader={true}
+                        isBaseGroup={this.isBaseGroup()}
+                        image={post.image ? post.image.url : null}
+                        isHome={this.props.isHome}
+                        username={post.name}
+                        userId={post.user}
+                      />
+                    );
+                  }}
+                </PostLoader>
+              )}
+              {this.props.canPost !== false && (
+                <InputBox path={path} color={color} />
+              )}
+            </View>
+          )
         }
         keyExtractor={i => {
-          return i;
+          return i.id;
         }}
         style={{ flex: 1 }}
         data={this.state.items}
         renderItem={i => {
-          let p = i.item;
+          let p = i.item._data;
+          let tp = this.extractInitialPath(i.item)
+          console.log(p);
           return (
-            <PostLoader color={color} path={p} realtime={true}>
+            <PostLoader color={color} path={tp} realtime={true}>
               {post => {
                 return (
                   <ImagePost

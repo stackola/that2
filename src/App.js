@@ -7,7 +7,10 @@ import {
 } from "react-navigation";
 import Home from "./screens/Home";
 import Details from "./screens/Details";
+import Report from "./screens/Report";
 import SignInScreen from "./screens/SignInScreen";
+import MyPosts from "./screens/MyPosts";
+import MyProfile from "./screens/MyProfile";
 import AuthLoadingScreen from "./screens/AuthLoadingScreen";
 
 import { OverlayProvider } from "./components/overlay/";
@@ -29,7 +32,10 @@ class OtherScreen extends React.Component {
 const AppStack = createStackNavigator(
   {
     Home: Home,
-    Details: Details
+    Details: Details,
+    Report: Report,
+    MyProfile: MyProfile,
+    MyPosts: MyPosts,
     /*
   SingleComment: SingleComment,
   Events: Events,

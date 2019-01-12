@@ -20,7 +20,7 @@ class Post extends PureComponent {
   }
   render() {
     let isImage = !!this.props.image;
-    console.log("render post");
+    //console.log("render post");
     let isHome = this.props.isHome || this.props.isBaseGroup;
     return (
       <ImageBackground
@@ -94,16 +94,17 @@ class Post extends PureComponent {
             </Text>
             {!isHome && !this.props.isBaseGroup && (
               <View style={{ flexDirection: "row" }}>
-                <Text
-                  style={{
-                    flex: 1,
-                    color: isImage ? colors.light : colors.text,
-                    fontWeight: this.isSelf() ? "bold" : "normal",
-                    textDecorationLine: this.isSelf() ? "underline" : "none"
-                  }}
-                >
-                  {this.props.username}
-                </Text>
+                <TouchableOpacity style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      color: isImage ? colors.light : colors.text,
+                      fontWeight: this.isSelf() ? "bold" : "normal",
+                      textDecorationLine: this.isSelf() ? "underline" : "none"
+                    }}
+                  >
+                    {this.props.username}
+                  </Text>
+                </TouchableOpacity>
                 <TimeDisplay
                   style={{ color: isImage ? colors.light : colors.text }}
                   time={this.props.updated}

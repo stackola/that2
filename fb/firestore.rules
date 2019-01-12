@@ -12,8 +12,15 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.auth.token.name == user;
     }
+     match /users/{user}/posts/{postId} {
+      allow read: if true;
+      allow write: if request.auth.token.name == user;
+    }
     match /groups/{allDocuments=**}{
       allow read: if true;
+    }
+    match /reports/{report}{
+      allow create: if true;
     }
     match /uploads/{userId}/{allDocuments=**} {
       allow read: if true;

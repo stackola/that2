@@ -8,12 +8,12 @@ import { getColor } from "That/src/lib";
 export default class Details extends Component {
   componentDidMount = () => {
     var user = firebase.auth().currentUser;
-    console.log(user);
+    //console.log(user);
   };
 
   render() {
     let path = this.props.navigation.getParam("path", null);
-    console.log(path);
+    //console.log(path);
     let color = getColor(path);
     return (
       <View style={{ flex: 1, backgroundColor: color, paddingTop: 4 }}>

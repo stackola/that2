@@ -33,7 +33,7 @@ class Header extends Component {
     return !this.isHome();
   }
   canGoHome() {
-    return !this.isHome();
+    return !this.isHome() && !this.props.hideHome;
   }
   isHome() {
     return this.props.path == "groups/home";
@@ -44,6 +44,12 @@ class Header extends Component {
   }
   save() {
     doSave(this.props.path);
+  }
+  report() {
+    this.props.navigation.navigate({
+      routeName: "Report",
+      params: { path: this.props.path }
+    });
   }
   isWatching() {
     return (
@@ -93,7 +99,17 @@ class Header extends Component {
           />
         )}
         <View style={{ flex: 1 }} />
+        {this.canGoUp() && (
+          <Button
+            onPress={() => {
+              this.report();
+            }}
+            color={this.props.color}
+            icon="flag"
+          />
+        )}
         {!this.isHome() &&
+          !this.props.hideWatch &&
           (this.isWatching() ? (
             <Button
               onPress={() => {

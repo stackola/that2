@@ -8,7 +8,7 @@ export default class ItemLoader extends PureComponent {
    
   }
   subscribeToChanges() {
-    console.log("GOTTA SUB!");
+    ///console.log("GOTTA SUB!");
     let path = this.props.path;
     this.sub1 = firebase
       .firestore()
@@ -28,7 +28,7 @@ export default class ItemLoader extends PureComponent {
       });
   }
   componentDidMount() {
-    console.log(this.props.path);
+    //console.log(this.props.path);
     if (this.props.realtime) {
       //subscribe to item
       this.subscribeToChanges();

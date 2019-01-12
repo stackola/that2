@@ -27,7 +27,7 @@ export function post(text, image, path) {
   console.log("GO");
   return sendPost({ text, path, image })
     .then(r => {
-      console.log(r);
+      //console.log(r);
       doSave(r.data.newPath, true, false);
       doSave(path, true, false);
       return r;
@@ -37,24 +37,28 @@ export function post(text, image, path) {
     });
 }
 
-export function getPosts(path, number) {
-  console.log("trying");
-  return firebase
+export function getPosts(path, number, coll, sort = "updated", after) {
+  //console.log({path, number, coll});
+  //console.log("trying");
+  let r = firebase
     .firestore()
     .doc(path)
-    .collection("posts")
-    .orderBy("updated", "DESC")
-    .limit(number)
-    .get();
+    .collection(coll)
+    .orderBy(sort, "DESC");
+  if (after) {
+    r = r.startAfter(after);
+  }
+  return r.limit(number).get();
 }
 
-export function subTo(path, number) {
-  console.log("trying");
+export function subTo(path, number, coll, sort = "updated") {
+  //console.log({path, number, coll});
+  //console.log("trying");
   return firebase
     .firestore()
     .doc(path)
-    .collection("posts")
-    .orderBy("updated", "DESC")
+    .collection(coll)
+    .orderBy(sort, "DESC")
     .limit(number);
 }
 
@@ -64,7 +68,7 @@ export function getColor(string) {
   let add = "";
   while (c != "rgba(255, 255, 255, 1)") {
     r = hash(string + add);
-    console.log(r);
+    //console.log(r);
     add += ".";
     c = r.color;
   }
@@ -106,7 +110,7 @@ export function uploadImage(
 
 function registerImage(snap) {
   let userId = getUID();
-  image = {
+  let image = {
     user: userId,
     path: snap.path.replace("/", ""),
     url: snap.url,
@@ -118,6 +122,23 @@ function registerImage(snap) {
     .firestore()
     .doc(image.path)
     .set(image);
+}
+
+export function report(path, reason, moreInfo) {
+  let userId = getUID();
+  let r = {
+    user: userId,
+    path: path,
+    reason: reason,
+    moreInfo: moreInfo,
+    time: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  //console.log(image);
+  return firebase
+    .firestore()
+    .collection("reports")
+    .doc()
+    .set(r);
 }
 
 export function makeUser(u) {
@@ -136,7 +157,7 @@ function getPathId(p) {
   let a = p.split("/");
   return a[a.length - 1];
 }
-export function doSave(path, onlySave, showToast=true) {
+export function doSave(path, onlySave, showToast = true) {
   let user = getUser();
   let username = user.displayName;
   let ref = firebase
@@ -157,14 +178,18 @@ export function doSave(path, onlySave, showToast=true) {
           .then(r => {
             console.log(r);
           });
-        showToast && ToastAndroid.show("No longer watching that", ToastAndroid.SHORT);
+        showToast &&
+          ToastAndroid.show("No longer watching that", ToastAndroid.SHORT);
         return ref.delete();
       }
     } else {
       //add to watchlist.
       firebase.messaging().subscribeToTopic(getPathId(path));
       showToast && ToastAndroid.show("Watching that", ToastAndroid.SHORT);
-      return ref.set({ path: path });
+      return ref.set({
+        path: path,
+        time: firebase.firestore.FieldValue.serverTimestamp()
+      });
     }
     //if (snap.)
   });
